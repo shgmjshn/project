@@ -33,6 +33,7 @@ impl Guess {
     }
 }
 
+#[allow(dead_code)]
 fn prints_and_returns_10(a: i32) -> i32 {
     // {}という値を得た
     println!("I got the value {}", a);

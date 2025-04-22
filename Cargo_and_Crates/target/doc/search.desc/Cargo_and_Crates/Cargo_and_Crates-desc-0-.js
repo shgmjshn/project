@@ -1,1 +1,0 @@
-searchState.loadedDescShard("Cargo_and_Crates", 0, "Adds one to the number given. …")
