@@ -1,9 +1,5 @@
-use crate::gui;
-use gui::Screen;
-
-pub trait Draw {
-    fn draw(&self);
-}
+mod lib;
+use lib::gui::{self, Screen, Draw, Button};
 
 pub struct SelectBox {
     pub width: u32,
@@ -14,18 +10,6 @@ pub struct SelectBox {
 impl Draw for SelectBox {
     fn draw(&self) {
         // 実際にセレクトボックスを描画するコード
-    }
-}
-
-pub struct Button {
-    pub width: u32,
-    pub height: u32,
-    pub label: String,
-}
-
-impl Draw for Button {
-    fn draw(&self) {
-        // 実際にボタンを描画するコード
     }
 }
 
