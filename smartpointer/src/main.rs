@@ -1,6 +1,13 @@
-use std::rc::Rc;
+use std::rc::{Rc, Weak};
 use std::ops::Deref;
 use std::cell::RefCell;
+
+#[derive(Debug)]
+struct Node {
+    value:i32,
+    parent: RefCell<Weak<Node>>,
+    children: RefCell<Vec<Rc<Node>>>,
+}
 
 #[derive(Debug)]
 enum List {
@@ -10,7 +17,7 @@ enum List {
 
 impl List {
     fn tail(&self) -> Option<&RefCell<Rc<List>>> {
-        match *self {
+        match self {
             Cons(_, item) => Some(item),
             Nil => None,
         }
@@ -51,6 +58,50 @@ fn hello(name: &str) {
 }
 
 fn main() {
+    let leaf = Rc::new(Node {
+        value:3,
+        parent: RefCell::new(Weak::new()),
+        children: RefCell::new(vec![]),
+    });
+
+    println!(
+        // leafのstrong_count = {}, weak/count = {}
+        "leaf strong = {}, weak = {}",
+        Rc::strong_count(&leaf),
+        Rc::weak_count(&leaf),
+    );
+
+    {
+        // leafの親 = {:?}
+        let branch = Rc::new(Node {
+            value:5,
+            parent: RefCell::new(Weak::new()),
+            children: RefCell::new(vec![Rc::clone(&leaf)]),
+        });
+
+        *leaf.parent.borrow_mut() = Rc::downgrade(&branch);
+
+        println!(
+            // branchのstrong_count = {}, weak_count = {}
+            "branch strong = {}, weak = {}",
+            Rc::strong_count(&branch),
+            Rc::weak_count(&branch),
+        );
+
+        println!(
+            "leaf strong = {}, weak = {}",
+            Rc::strong_count(&leaf),
+            Rc::weak_count(&leaf),
+        );
+    }
+
+    println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
+    println!(
+        "leaf strong = {}, weak = {}",
+        Rc::strong_count(&leaf),
+        Rc::weak_count(&leaf),
+    );
+
     let value = Rc::new(RefCell::new(5));
 
     let b = Box::new(5);
@@ -67,7 +118,7 @@ fn main() {
     // aの最初のアカウント参照 = {}
     println!("a initial rc count = {}", Rc::strong_count(&a));
     // aの次の要素は = {:?}
-    println!("a next item = {:?}", a.tail);
+    println!("a next item = {:?}", a.tail());
 
     let b = Rc::new(Cons(10, RefCell::new(Rc::clone(&a))));
 
@@ -76,7 +127,7 @@ fn main() {
     // bの最初のアカウント参照 = {}
     println!("b initial rc count = {}", Rc::strong_count(&b));
     // aの次の要素は = {:?}
-    println!("a next item = {:?}", a.tail);
+    println!("a next item = {:?}", a.tail());
 
     if let Some(link) = a.tail() {
         *link.borrow_mut() = Rc::clone(&b);
@@ -95,7 +146,7 @@ fn main() {
      // Uncomment the next line to see that we have a cycle;
      // it will overflow the stack
      // 次の行のコメントを外して循環していると確認してください; スタックオーバーフローします
-     // println!("a next item = {:?}", a.tail());        // aの次の要素 = {:?}
+     println!("a next item = {:?}", a.tail());        // aの次の要素 = {:?}
 
     let x = 5;
     let y = Box::new(x);

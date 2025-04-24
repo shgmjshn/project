@@ -11,7 +11,7 @@ pub fn greeting(name: &str) -> String {
 }
 
 pub struct Guess {
-    value: i32,
+    pub value: i32,
 }
 
 impl Guess {
