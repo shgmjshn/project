@@ -1,5 +1,8 @@
 [workspace]
 
 members = [
-    "unsafe_rust"
+    "unsafe_rust",
+    "advanced_traits",
+    "macros",
+    "macros/pancakes"
 ]
